@@ -25,13 +25,56 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                style="@style/TextAppearance.Material3.DisplaySmall"
-                android:text="Registration Form"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="15dp"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    style="@style/TextAppearance.Material3.DisplaySmall"
+                    android:text="Registration Form"
+                    />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        app:cardCornerRadius="100dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:backgroundTint="@color/base"
+                        app:cardElevation="3dp"
+                        android:layout_margin="5dp"
+                        android:id="@+id/imageCard"
+                        style="@style/Widget.Material3.CardView.Outlined"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            app:tint="@color/purple_200"
+                            android:src="@drawable/ic_twotone_insert_emoticon_24"
+                            />
+                    </com.google.android.material.card.MaterialCardView>
+                    <ImageView
+                        android:src="@drawable/ic_twotone_camera_alt_24"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:elevation="5dp"
+                        app:tint="@color/onBase" />
+                </FrameLayout>
+            </LinearLayout>
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card"
                 android:layout_width="match_parent"
@@ -220,6 +263,7 @@
                             android:layout_height="wrap_content"
                             android:maxLines="1"
                             android:lines="1"
+                            android:inputType="textPassword"
                             android:singleLine="true"
                             />
 
@@ -236,16 +280,34 @@
                             android:layout_height="wrap_content"
                             android:maxLines="1"
                             android:lines="1"
+                            android:inputType="textPassword"
                             android:singleLine="true"
                             />
 
                     </com.google.android.material.textfield.TextInputLayout>
-                    <Button
-                        android:id="@+id/signup"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="20dp"
-                        android:text="Sign Up" />
+                        android:layout_height="wrap_content">
+                        <Button
+                            android:id="@+id/login"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="15dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:text="Login" />
+                        <Button
+                            android:id="@+id/signup"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="15dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="10dp"
+                            style="@style/Widget.Material3.Button"
+                            android:text="Sign Up" />
+
+                    </LinearLayout>
                     <TextView
                         android:layout_marginTop="10dp"
                         android:layout_width="wrap_content"

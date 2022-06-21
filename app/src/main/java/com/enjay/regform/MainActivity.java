@@ -2,17 +2,23 @@ package com.enjay.regform;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
@@ -22,8 +28,8 @@ import java.util.regex.Pattern;
 public class MainActivity extends AppCompatActivity {
 
     public static final String USERNAME_PATTERN = "[A-Za-z]([A-Za-z0-9]){2,20}";
-    public static final String FULL_NAME_PATTERN = "[A-Za-z]{1,20} [A-Za-z]{1,20}";
-    public static final String EMAIL_PATTERN = "(([A-Za-z][A-Za-z0-9_.]{1,64})@[A-Za-z]{2,}(([.]{1})([A-Za-z]{2,255}))*)";
+    public static final String FULL_NAME_PATTERN = "[A-Za-z ]*";
+    public static final String EMAIL_PATTERN = "(([A-Za-z][A-Za-z0-9_.]{1,64})@[A-Za-z]{2,}([.]{1})([A-Za-z]{2,255}))*";
     public static final String NUMBER_PATTERN = "([0-9]{10,14})";
     public static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d{3,})(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,}$";
 
@@ -88,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             if( usernameCheck&& fullNameCheck && emailCheck&& numberCheck&& newPasswordCheck&& confirmPasswordCheck&& genderCheck&& hobbiesCheck){
                String result = data.insertUser(username,fullName,email,number,gender,
                         hobbies.toString(),
-                        newPassword);
+                        newPassword); 
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
             }
 
@@ -105,6 +111,17 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return false;
             }
+        });
+
+        MaterialCardView card = findViewById(R.id.imageCard);
+        card.setOnClickListener(v->{
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            ViewGroup viewGroup = findViewById(android.R.id.content);
+            View dialogView = LayoutInflater.from(v.getContext()).inflate(R.layout.profile_dialog, viewGroup,
+                    false);
+            builder.setView(dialogView);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         });
     }
 //For getting inputs
@@ -185,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
             hobbies.add("Reading");
         };
 
+
         if(hobbiesCheck) findViewById(R.id.hobbiError).setVisibility(View.GONE);
         else findViewById(R.id.hobbiError).setVisibility(View.VISIBLE);
         return hobbies;
@@ -197,11 +215,23 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-
-                if(checkPattern(str, USERNAME_PATTERN)){
+                //textInputLayout.setError(null);
+                if(str.length()==0){
+                    textInputLayout.setError("Cannot be empty");
+                    usernameCheck = false;
+                }
+                else if(checkPattern(str, USERNAME_PATTERN)){
                     textInputLayout.setError(null);
                     usernameCheck = true;
-                }else{
+                }else if(Character.isDigit(str.charAt(i))){
+                    textInputLayout.setError("Number not allowed at start.");
+                    usernameCheck = false;
+                }
+                else if(str.length()>20){
+                    textInputLayout.setError("Max length reached");
+                    usernameCheck = false;
+                }
+                else{
                     textInputLayout.setError("Invalid Input");
                     usernameCheck = false;
                 }
@@ -218,12 +248,15 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-
-                if(checkPattern(str, FULL_NAME_PATTERN)){
+                if(str.length()==0){
+                    textInputLayout.setError("Cannot be empty");
+                    usernameCheck = false;
+                }
+                else if(checkPattern(str, FULL_NAME_PATTERN)){
                     textInputLayout.setError(null);
                     fullNameCheck = true;
                 }else{
-                    textInputLayout.setError("Invalid Input");
+                    textInputLayout.setError("Invalid Input, only letters");
                     fullNameCheck = false;
                 }
             }
@@ -239,8 +272,11 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-
-                if(checkPattern(str, EMAIL_PATTERN)){
+                if(str.length()==0){
+                    textInputLayout.setError("Cannot be empty");
+                    usernameCheck = false;
+                }
+                else if(checkPattern(str, EMAIL_PATTERN)){
                     textInputLayout.setError(null);
                     emailCheck = true;
                 }else{
@@ -260,12 +296,19 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-
-                if(checkPattern(str, NUMBER_PATTERN)){
+                if(str.length()==0){
+                    textInputLayout.setError("Cannot be empty");
+                    usernameCheck = false;
+                }
+                else if(str.length()<10 || str.length()>15){
+                    textInputLayout.setError("Minimum 10, maximum 14 numbers");
+                    numberCheck = false;
+                }
+                else if(checkPattern(str, NUMBER_PATTERN)){
                     textInputLayout.setError(null);
                     numberCheck = true;
                 }else{
-                    textInputLayout.setError("Invalid Number");
+                    textInputLayout.setError("Only number allowed");
                     numberCheck = false;
                 }
             }
@@ -281,12 +324,16 @@ public class MainActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-
-                if(checkPattern(str, PASSWORD_PATTERN)){
+                if(str.length()==0){
+                    textInputLayout.setError("Cannot be empty");
+                    usernameCheck = false;
+                }
+                else if(checkPattern(str, PASSWORD_PATTERN)){
                     textInputLayout.setError(null);
                     newPasswordCheck = true;
                 }else{
-                    textInputLayout.setError("Weak Password");
+                    textInputLayout.setError("Must contain (1 uppercase, 1 special character,3 " +
+                            "digits and minimum 10 length)");
                     newPasswordCheck = false;
                 }
             }

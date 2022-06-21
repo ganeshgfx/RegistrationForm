@@ -7,5 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
 
-    <color name="base">#DF000000</color>
+    <color name="base">#1D1D1D</color>
+    <color name="onBase">#FFFFFF</color>
 </resources>
