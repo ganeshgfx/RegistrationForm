@@ -9,6 +9,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
@@ -23,9 +25,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String GENDER = "gender";
     public static final String HOBBIES = "hobbies";
     public static final String PASSWORD = "password";
+    public static final String PROFILE = "profile";
 
     public DBHelper(Context context) {
-        super(context, DATABASE , null, 13);
+        super(context, DATABASE , null, 15);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -33,7 +36,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
                 "create table "+TABLE_NAME+"("+USERNAME+" text PRIMARY KEY,fullname text,"+EMAIL+" text," +
                         "number " +
-                        "text,gender text,hobbies text,password text);"
+                        "text,gender text,hobbies text,password text,"+PROFILE+" blob);"
         );
     }
     @Override
@@ -42,9 +45,8 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
         onCreate(db);
     }
-
     public String insertUser (String username, String fullname, String email, String number,
-                               String gender,String hobbies,String password) {
+                               String gender,String hobbies,String password,byte[] img) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(USERNAME, username);
@@ -55,10 +57,13 @@ public class DBHelper extends SQLiteOpenHelper {
         contentValues.put(HOBBIES, hobbies);
         contentValues.put(GENDER, gender);
         contentValues.put(PASSWORD, password);
+        contentValues.put(PROFILE,img);
         try {
             db.insertOrThrow(TABLE_NAME, null, contentValues);
-        }catch (Exception error){
+        }catch (SQLiteConstraintException error){
             return "Error : "+error.getMessage();
+        }catch (Exception error){
+            return "Some Error : "+error.getMessage();
         }
         return "Inserted";
     }
@@ -80,6 +85,40 @@ public class DBHelper extends SQLiteOpenHelper {
                 "\n"+GENDER+" : "+res.getString(res.getColumnIndex(GENDER))+
                 "\n"+HOBBIES+" : "+res.getString(res.getColumnIndex(HOBBIES))+
                 "\n"+PASSWORD+" : "+res.getString(res.getColumnIndex(PASSWORD));
+    }
+    public Bitmap getProfile(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cur =
+                db.rawQuery( "select "+PROFILE+" from "+TABLE_NAME+" where "+USERNAME+" = '"+username+
+                        "';"
+                , null );
 
+        if (cur.moveToFirst()){
+            byte[] imgByte = cur.getBlob(0);
+            cur.close();
+            return BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+        }
+        if (cur != null && !cur.isClosed()) {
+            cur.close();
+        }
+
+        return null;
+    }
+    @SuppressLint("Range")
+    public String login(String username, String password){
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res =
+                db.rawQuery( "select * from "+TABLE_NAME+" where "+USERNAME+" = '"+username+"' " +
+                                "AND '"+password+"';"
+                , null );
+        res.moveToFirst();
+
+        return USERNAME+" : "+res.getString(res.getColumnIndex(USERNAME))+
+                "\n"+FULL_NAME+" : "+res.getString(res.getColumnIndex(FULL_NAME))+
+                "\n"+EMAIL+" : "+res.getString(res.getColumnIndex(EMAIL))+
+                "\n"+NUMBER+" : "+res.getString(res.getColumnIndex(NUMBER))+
+                "\n"+GENDER+" : "+res.getString(res.getColumnIndex(GENDER))+
+                "\n"+HOBBIES+" : "+res.getString(res.getColumnIndex(HOBBIES))+
+                "\n"+PASSWORD+" : "+res.getString(res.getColumnIndex(PASSWORD));
     }
 }

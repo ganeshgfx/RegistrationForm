@@ -1,26 +1,47 @@
 package com.enjay.regform;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.animation.AnimatorSet;
+import android.animation.TimeAnimator;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -31,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String FULL_NAME_PATTERN = "[A-Za-z ]*";
     public static final String EMAIL_PATTERN = "(([A-Za-z][A-Za-z0-9_.]{1,64})@[A-Za-z]{2,}([.]{1})([A-Za-z]{2,255}))*";
     public static final String NUMBER_PATTERN = "([0-9]{10,14})";
-    public static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d{3,})(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{10,}$";
+    public static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d{3,})(?=" +
+            ".*[@$!%*?&])[A-Za-z\\d@$!%*?& .\\\\/|(){}^#_+=₹\"'`:;,~`|•√π÷×¶∆£€$¢°©®™✓-]{10,}$";
 
     String username;
     String fullName;
@@ -41,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     String confirmPassword;
     String gender;
     List<String> hobbies;
+    Bitmap img;
 
     boolean usernameCheck;
     boolean fullNameCheck;
@@ -50,8 +73,14 @@ public class MainActivity extends AppCompatActivity {
     boolean confirmPasswordCheck;
     boolean genderCheck;
     boolean hobbiesCheck;
+    boolean profileCheck;
 
     DBHelper data;
+
+    ImageView editProfileIcon;
+    ImageView profile;
+    AlertDialog alertDialog;
+    MaterialCardView imageCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +88,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         data = new DBHelper(MainActivity.this);
-//
-//        data.insertUser("ganesh","g g","g@g.com","123","m","photo","123");
 
-        //Toast.makeText(this, data.getData("ganesh")+"", Toast.LENGTH_SHORT).show();
+        profile = findViewById(R.id.profile);
+        editProfileIcon = findViewById(R.id.editProfileIcon);
 
         checkUsername();
         checkFullName();
@@ -91,40 +119,164 @@ public class MainActivity extends AppCompatActivity {
                 confirmPasswordCheck = true;
             }
 
-            if( usernameCheck&& fullNameCheck && emailCheck&& numberCheck&& newPasswordCheck&& confirmPasswordCheck&& genderCheck&& hobbiesCheck){
-               String result = data.insertUser(username,fullName,email,number,gender,
+            if( usernameCheck&& fullNameCheck && emailCheck&& numberCheck&& newPasswordCheck&& confirmPasswordCheck&& genderCheck&& hobbiesCheck && checkProfile()){
+                String result = data.insertUser(username,fullName,email,number,gender,
                         hobbies.toString(),
-                        newPassword); 
+                        newPassword,bitmapToByte(img));
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
             }
 
         });
-        signup.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                TextView output = findViewById(R.id.output);
-                Log.d("TAG", "onLongClick: rows : "+data.numberOfRows());
-                try{
-                    output.setText(data.getData(getInput(R.id.username)));
-                }catch (Exception e){
-                    output.setText("Error : "+e.getMessage());
-                }
-                return false;
+        signup.setOnLongClickListener(view -> {
+
+            TextView output = findViewById(R.id.output);
+            Log.d("TAG", "onLongClick: rows : "+data.numberOfRows());
+            try{
+                output.setText(data.getData(getInput(R.id.username)));
+                profile.setImageBitmap(data.getProfile(getInput(R.id.username)));
+            }catch (Exception e){
+                output.setText("Error : "+e.getMessage());
             }
+            return false;
         });
 
-        MaterialCardView card = findViewById(R.id.imageCard);
-        card.setOnClickListener(v->{
+        imageCard = findViewById(R.id.imageCard);
+        imageCard.setOnClickListener(v->{
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             ViewGroup viewGroup = findViewById(android.R.id.content);
             View dialogView = LayoutInflater.from(v.getContext()).inflate(R.layout.profile_dialog, viewGroup,
                     false);
+            dialogView.findViewById(R.id.capture).setOnClickListener(click->{
+                captureImage();
+            });
+            dialogView.findViewById(R.id.select).setOnClickListener(click->{
+                selectImage();
+            });
             builder.setView(dialogView);
-            AlertDialog alertDialog = builder.create();
+            builder.setTitle("Add profile picture");
+            builder.setNegativeButton("Cancel", (dialog, i) -> {
+                dialog.dismiss();
+            });
+            alertDialog = builder.create();
             alertDialog.show();
+            imageCard.setStrokeColor(ContextCompat.getColor(this,R.color.onBase));
+            imageCard.setStrokeWidth(1);
+            editProfileIcon.setColorFilter(ContextCompat.getColor(this,R.color.onBase));
+        });
+
+        findViewById(R.id.login).setOnClickListener(click->{
+            startActivity(new Intent(MainActivity.this,LoginActivity.class));
         });
     }
-//For getting inputs
+
+    private boolean checkProfile() {
+        if(!profileCheck){
+            imageCard.setStrokeColor(ContextCompat.getColor(this,R.color.red));
+
+            ValueAnimator animation = ValueAnimator.ofInt(0, 7);
+            animation.setInterpolator(new AnticipateOvershootInterpolator());
+            animation.setDuration(500);
+            animation.start();
+            animation.addUpdateListener(updatedAnimation -> {
+                int animatedValue = (int)updatedAnimation.getAnimatedValue();
+                imageCard.setStrokeWidth(animatedValue);
+            });
+
+            editProfileIcon.setColorFilter(ContextCompat.getColor(this,R.color.red));
+
+            ScrollView scrollView = findViewById(R.id.mainScroll);
+            scrollView.scrollTo(0,0);
+            Toast.makeText(this, "Please add profile", Toast.LENGTH_SHORT).show();
+        }
+        return profileCheck;
+    }
+
+    private void captureImage() {
+        if(checkCamPermision()){
+            Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//            startActivityForResult(i,reqCode);
+            try {
+                takeImage.launch(i);
+            }catch (Exception e){
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            Toast.makeText(this, "Please Allow Camera permission", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}
+                    , 100);
+        }
+    }
+    private void selectImage() {
+        //Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        //photoPickerIntent.setType("image/*");
+        //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+        selectImage.launch("image/*");
+    }
+    private boolean checkCamPermision()
+    {
+        String permission = android.Manifest.permission.CAMERA;
+        int res = getApplicationContext().checkCallingOrSelfPermission(permission);
+        return (res == PackageManager.PERMISSION_GRANTED);
+    }
+    ActivityResultLauncher<String> selectImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri imageUri) {
+                    try {
+                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                        profile.setImageBitmap(selectedImage);
+                        profileCheck = true;
+                        alertDialog.dismiss();
+                        img = selectedImage;
+                    } catch (FileNotFoundException e) {
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
+            });
+    ActivityResultLauncher<Intent> takeImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if(result.getResultCode() == RESULT_OK && result.getData()!=null){
+                Bundle bundle = result.getData().getExtras();
+                Bitmap image = (Bitmap) bundle.get("data");
+                profile.setImageBitmap(image);
+                profileCheck = true;
+                alertDialog.dismiss();
+                img = image;
+            }
+        }
+    });
+byte[] bitmapToByte(Bitmap bitmap){
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 10, outputStream);
+        return outputStream.toByteArray();
+    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+//        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+//
+//        switch(requestCode) {
+//            case 100:
+//                if(resultCode == RESULT_OK){
+//                    try {
+//                        final Uri imageUri = imageReturnedIntent.getData();
+//                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+//                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+//
+//                        profile.setImageBitmap(selectedImage);
+//
+//                        alertDialog.dismiss();
+//                    } catch (FileNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//                break;
+//        }
+//    }
+    //For getting inputs
     String getInput(int id){
         TextInputLayout textInputLayout = findViewById(id);
         return textInputLayout.getEditText().getText().toString();
@@ -158,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setTextError(int id, boolean set) {
         if(set)
-        findViewById(id).setVisibility(View.VISIBLE);
+            findViewById(id).setVisibility(View.VISIBLE);
         else findViewById(id).setVisibility(View.GONE);
     }
 
@@ -202,7 +354,6 @@ public class MainActivity extends AppCompatActivity {
             hobbies.add("Reading");
         };
 
-
         if(hobbiesCheck) findViewById(R.id.hobbiError).setVisibility(View.GONE);
         else findViewById(R.id.hobbiError).setVisibility(View.VISIBLE);
         return hobbies;
@@ -216,6 +367,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
                 //textInputLayout.setError(null);
+                //Toast.makeText(MainActivity.this, str.charAt(str.length()-1)+"",Toast.LENGTH_SHORT).show();
                 if(str.length()==0){
                     textInputLayout.setError("Cannot be empty");
                     usernameCheck = false;
@@ -223,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 else if(checkPattern(str, USERNAME_PATTERN)){
                     textInputLayout.setError(null);
                     usernameCheck = true;
-                }else if(Character.isDigit(str.charAt(i))){
+                }else if(Character.isDigit(str.charAt(0))){
                     textInputLayout.setError("Number not allowed at start.");
                     usernameCheck = false;
                 }
@@ -232,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
                     usernameCheck = false;
                 }
                 else{
-                    textInputLayout.setError("Invalid Input");
+                    textInputLayout.setError("Invalid Input only letters and numbers allowed");
                     usernameCheck = false;
                 }
             }

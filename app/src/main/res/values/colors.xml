@@ -10,4 +10,8 @@
 
     <color name="base">#DFFFFFFF</color>
     <color name="onBase">#505050</color>
+
+    <color name="backg">#C8FFFFFF</color>
+
+    <color name="red">#D32F2F</color>
 </resources>
