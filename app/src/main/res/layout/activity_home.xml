@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_margin="30dp"
+            style="@style/TextAppearance.Material3.HeadlineMedium"
+            android:text="Welcome"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                app:cardCornerRadius="100dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:strokeWidth="2dp"
+                app:strokeColor="@color/purple_200"
+                android:backgroundTint="@color/base"
+                app:cardElevation="6dp"
+                android:layout_margin="9dp"
+                android:layout_marginTop="20dp"
+                android:id="@+id/imageCard"
+                app:rippleColor="@color/purple_500"
+                style="@style/Widget.Material3.CardView.Outlined"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:scaleType="centerCrop"
+                    android:id="@+id/profile"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_twotone_insert_emoticon_24"
+                    />
+
+            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:id="@+id/name"
+                android:layout_marginTop="10dp"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:text="User"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="viewStart"
+                android:layout_gravity="center"
+                android:id="@+id/details"
+                android:padding="50dp"
+                style="@style/TextAppearance.Material3.BodySmall"
+                android:text="User {\nerror : some error is there \n}"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

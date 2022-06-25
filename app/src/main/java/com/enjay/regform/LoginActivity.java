@@ -11,6 +11,7 @@ import com.google.android.material.textfield.TextInputLayout;
 public class LoginActivity extends AppCompatActivity {
 
     DBHelper data;
+    User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,11 +19,24 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         findViewById(R.id.signup).setOnClickListener(click->{
             startActivity(new Intent(LoginActivity.this,MainActivity.class));
+            finish();
         });
         findViewById(R.id.login).setOnClickListener(click->{
             data = new DBHelper(LoginActivity.this);
-            Toast.makeText(this, data.login(getInput(R.id.username),getInput(R.id.password)),
-                    Toast.LENGTH_SHORT).show();
+            user = data.login(getInput(R.id.username).trim(),getInput(R.id.password));
+            if(user==null){
+                Toast.makeText(this,"Invalid Username or Password",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Intent intent = new Intent(LoginActivity.this,HomeActivity.class);
+                intent.putExtra("USERNAME", user.username);
+                intent.putExtra("PASSWORD", user.password);
+                startActivity(intent);
+                finish();
+                //Toast.makeText(this, user.toString(),Toast.LENGTH_SHORT).show();
+            }
+
         });
     }
     String getInput(int id){

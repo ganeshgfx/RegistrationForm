@@ -9,8 +9,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.animation.AnimatorSet;
-import android.animation.TimeAnimator;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
     boolean confirmPasswordCheck;
     boolean genderCheck;
     boolean hobbiesCheck;
-    boolean profileCheck;
+    boolean profileCheck = false;
 
     DBHelper data;
 
@@ -81,16 +79,36 @@ public class MainActivity extends AppCompatActivity {
     ImageView profile;
     AlertDialog alertDialog;
     MaterialCardView imageCard;
+    TextInputLayout passwordInputLayout;
+    TextInputLayout confirmPasswordTL ;
+    TextInputLayout numberInputLayout;
+    TextInputLayout emailInputLayout;
+    TextInputLayout fullNameInputLayout;
+    TextInputLayout usernameInputLayout;
+    Button signup;
+    Button login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        startActivity(new Intent(MainActivity.this,LoginActivity.class));
+//        finish();
+
         data = new DBHelper(MainActivity.this);
 
         profile = findViewById(R.id.profile);
         editProfileIcon = findViewById(R.id.editProfileIcon);
+        imageCard = findViewById(R.id.imageCard);
+        passwordInputLayout = findViewById(R.id.newPassword);
+        confirmPasswordTL = findViewById(R.id.confirmPassword);
+        numberInputLayout = findViewById(R.id.number);
+        emailInputLayout = findViewById(R.id.email);
+        fullNameInputLayout = findViewById(R.id.fullName);
+        usernameInputLayout = findViewById(R.id.username);
+        signup = (Button) findViewById(R.id.signup);
+        login =  findViewById(R.id.login);
 
         checkUsername();
         checkFullName();
@@ -98,28 +116,16 @@ public class MainActivity extends AppCompatActivity {
         checkNumber();
         checkPassword();
 
-        Button signup = (Button) findViewById(R.id.signup);
         signup.setOnClickListener(click->{
 
             username = getInput(R.id.username);
             fullName = getInput(R.id.fullName);
             email = getInput(R.id.email);
             number = getInput(R.id.number);
-            gender = getGender();
-            hobbies = getHobbies();
             newPassword = getInput(R.id.newPassword);
             confirmPassword = getInput(R.id.confirmPassword);
 
-            TextInputLayout cp = findViewById(R.id.confirmPassword);
-            if(!newPassword.equals(confirmPassword)){
-                cp.setError("Password didn't match.");
-                confirmPasswordCheck = false;
-            }else {
-                cp.setError(null);
-                confirmPasswordCheck = true;
-            }
-
-            if( usernameCheck&& fullNameCheck && emailCheck&& numberCheck&& newPasswordCheck&& confirmPasswordCheck&& genderCheck&& hobbiesCheck && checkProfile()){
+            if( validateUsername(username) && validateFullName(fullName) && validateEmail(email) && validateNumber(number) && validatePassword(newPassword) && checkConfirmPassword() && isGenderCheck() && validateHobbies() && checkProfile()){
                 String result = data.insertUser(username,fullName,email,number,gender,
                         hobbies.toString(),
                         newPassword,bitmapToByte(img));
@@ -139,8 +145,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
-
-        imageCard = findViewById(R.id.imageCard);
         imageCard.setOnClickListener(v->{
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             ViewGroup viewGroup = findViewById(android.R.id.content);
@@ -163,13 +167,34 @@ public class MainActivity extends AppCompatActivity {
             imageCard.setStrokeWidth(1);
             editProfileIcon.setColorFilter(ContextCompat.getColor(this,R.color.onBase));
         });
-
-        findViewById(R.id.login).setOnClickListener(click->{
+        login.setOnClickListener(click->{
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
+            finish();
         });
     }
 
+    private boolean validateHobbies() {
+        gender = getGender();
+        return hobbiesCheck;
+    }
+
+    private boolean isGenderCheck() {
+        hobbies = getHobbies();
+        return genderCheck;
+    }
+
+    private boolean checkConfirmPassword() {
+        if(!newPassword.equals(confirmPassword)){
+            confirmPasswordTL.setError("Password didn't match.");
+            return false;
+        }else {
+            confirmPasswordTL.setError(null);
+             return true;
+        }
+    }
+
     private boolean checkProfile() {
+        //Toast.makeText(this, ""+profileCheck, Toast.LENGTH_SHORT).show();
         if(!profileCheck){
             imageCard.setStrokeColor(ContextCompat.getColor(this,R.color.red));
 
@@ -184,15 +209,19 @@ public class MainActivity extends AppCompatActivity {
 
             editProfileIcon.setColorFilter(ContextCompat.getColor(this,R.color.red));
 
-            ScrollView scrollView = findViewById(R.id.mainScroll);
-            scrollView.scrollTo(0,0);
+            scrollTop();
             Toast.makeText(this, "Please add profile", Toast.LENGTH_SHORT).show();
         }
         return profileCheck;
     }
 
+    private void scrollTop() {
+        ScrollView scrollView = findViewById(R.id.mainScroll);
+        scrollView.scrollTo(0,0);
+    }
+
     private void captureImage() {
-        if(checkCamPermision()){
+        if(checkCamPermission()){
             Intent i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 //            startActivityForResult(i,reqCode);
             try {
@@ -206,18 +235,20 @@ public class MainActivity extends AppCompatActivity {
                     , 100);
         }
     }
+
     private void selectImage() {
         //Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         //photoPickerIntent.setType("image/*");
         //startActivityForResult(photoPickerIntent, SELECT_PHOTO);
         selectImage.launch("image/*");
     }
-    private boolean checkCamPermision()
-    {
+
+    private boolean checkCamPermission() {
         String permission = android.Manifest.permission.CAMERA;
         int res = getApplicationContext().checkCallingOrSelfPermission(permission);
         return (res == PackageManager.PERMISSION_GRANTED);
     }
+
     ActivityResultLauncher<String> selectImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
@@ -229,12 +260,14 @@ public class MainActivity extends AppCompatActivity {
                         profileCheck = true;
                         alertDialog.dismiss();
                         img = selectedImage;
-                    } catch (FileNotFoundException e) {
-                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this,
+                                e.getLocalizedMessage()+":"+e.getMessage(), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 }
             });
+
     ActivityResultLauncher<Intent> takeImage = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
@@ -248,39 +281,27 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     });
-byte[] bitmapToByte(Bitmap bitmap){
+
+    byte[] bitmapToByte(Bitmap bitmap){
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 10, outputStream);
+
+        float ratio = Math.min(
+                (float) 500 / bitmap.getWidth(),
+                (float) 500 / bitmap.getHeight());
+        int width = Math.round((float) ratio * bitmap.getWidth());
+        int height = Math.round((float) ratio * bitmap.getHeight());
+
+        bitmap = Bitmap.createScaledBitmap(bitmap,width,height,true);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
         return outputStream.toByteArray();
     }
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
-//        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
-//
-//        switch(requestCode) {
-//            case 100:
-//                if(resultCode == RESULT_OK){
-//                    try {
-//                        final Uri imageUri = imageReturnedIntent.getData();
-//                        final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-//                        final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-//
-//                        profile.setImageBitmap(selectedImage);
-//
-//                        alertDialog.dismiss();
-//                    } catch (FileNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//                break;
-//        }
-//    }
-    //For getting inputs
     String getInput(int id){
         TextInputLayout textInputLayout = findViewById(id);
         return textInputLayout.getEditText().getText().toString();
     }
+
     String getGender(){
         RadioButton male =  (RadioButton)findViewById(R.id.male);
         RadioButton female =  (RadioButton)findViewById(R.id.female);
@@ -354,149 +375,183 @@ byte[] bitmapToByte(Bitmap bitmap){
             hobbies.add("Reading");
         };
 
-        if(hobbiesCheck) findViewById(R.id.hobbiError).setVisibility(View.GONE);
+        if(validateHobbies()) findViewById(R.id.hobbiError).setVisibility(View.GONE);
         else findViewById(R.id.hobbiError).setVisibility(View.VISIBLE);
         return hobbies;
     }
     //for validations
     void checkUsername(){
-        TextInputLayout textInputLayout = findViewById(R.id.username);
-        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+        usernameInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-                //textInputLayout.setError(null);
-                //Toast.makeText(MainActivity.this, str.charAt(str.length()-1)+"",Toast.LENGTH_SHORT).show();
-                if(str.length()==0){
-                    textInputLayout.setError("Cannot be empty");
-                    usernameCheck = false;
-                }
-                else if(checkPattern(str, USERNAME_PATTERN)){
-                    textInputLayout.setError(null);
-                    usernameCheck = true;
-                }else if(Character.isDigit(str.charAt(0))){
-                    textInputLayout.setError("Number not allowed at start.");
-                    usernameCheck = false;
-                }
-                else if(str.length()>20){
-                    textInputLayout.setError("Max length reached");
-                    usernameCheck = false;
-                }
-                else{
-                    textInputLayout.setError("Invalid Input only letters and numbers allowed");
-                    usernameCheck = false;
-                }
+                validateUsername(str);
             }
 
             @Override
             public void afterTextChanged(Editable editable){}
         });
     }
+
+    private boolean validateUsername(CharSequence str) {
+        if(str.length()==0){
+            usernameInputLayout.setError("Cannot be empty");
+            scrollTop();
+            return false;
+        }
+        else if(checkPattern(str, USERNAME_PATTERN)){
+            usernameInputLayout.setError(null);
+            return true;
+        }else if(Character.isDigit(str.charAt(0))){
+            usernameInputLayout.setError("Number not allowed at start.");
+            scrollTop();
+            return false;
+        }
+        else if(str.length()>20){
+            usernameInputLayout.setError("Max length reached");
+            scrollTop();
+            return false;
+        }
+        else{
+            usernameInputLayout.setError("Invalid Input only letters and numbers allowed");
+            scrollTop();
+            return false;
+        }
+    }
+
     void checkFullName(){
-        TextInputLayout textInputLayout = findViewById(R.id.fullName);
-        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+
+        fullNameInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-                if(str.length()==0){
-                    textInputLayout.setError("Cannot be empty");
-                    usernameCheck = false;
-                }
-                else if(checkPattern(str, FULL_NAME_PATTERN)){
-                    textInputLayout.setError(null);
-                    fullNameCheck = true;
-                }else{
-                    textInputLayout.setError("Invalid Input, only letters");
-                    fullNameCheck = false;
-                }
+                validateFullName(str);
             }
 
             @Override
             public void afterTextChanged(Editable editable){}
         });
     }
+
+    private boolean validateFullName(CharSequence str) {
+        if(str.length()==0){
+            fullNameInputLayout.setError("Cannot be empty");
+            scrollTop();
+            return false;
+        }
+        else if(checkPattern(str, FULL_NAME_PATTERN)){
+            fullNameInputLayout.setError(null);
+            return true;
+        }else{
+            fullNameInputLayout.setError("Invalid Input, only letters");
+            scrollTop();
+            return false;
+        }
+    }
+
     void checkEmail(){
-        TextInputLayout textInputLayout = findViewById(R.id.email);
-        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+        emailInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-                if(str.length()==0){
-                    textInputLayout.setError("Cannot be empty");
-                    usernameCheck = false;
-                }
-                else if(checkPattern(str, EMAIL_PATTERN)){
-                    textInputLayout.setError(null);
-                    emailCheck = true;
-                }else{
-                    textInputLayout.setError("Invalid Email");
-                    emailCheck = false;
-                }
+                validateEmail(str);
             }
 
             @Override
             public void afterTextChanged(Editable editable){}
         });
     }
+
+    private boolean validateEmail(CharSequence str) {
+        if(str.length()==0){
+            emailInputLayout.setError("Cannot be empty");
+            return false;
+        }
+        else if(checkPattern(str, EMAIL_PATTERN)){
+            emailInputLayout.setError(null);
+            return true;
+        }else{
+            emailInputLayout.setError("Invalid Email");
+            return false;
+        }
+    }
+
     void checkNumber(){
-        TextInputLayout textInputLayout = findViewById(R.id.number);
-        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+                numberInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-                if(str.length()==0){
-                    textInputLayout.setError("Cannot be empty");
-                    usernameCheck = false;
-                }
-                else if(str.length()<10 || str.length()>15){
-                    textInputLayout.setError("Minimum 10, maximum 14 numbers");
-                    numberCheck = false;
-                }
-                else if(checkPattern(str, NUMBER_PATTERN)){
-                    textInputLayout.setError(null);
-                    numberCheck = true;
-                }else{
-                    textInputLayout.setError("Only number allowed");
-                    numberCheck = false;
-                }
+                validateNumber(str);
             }
 
             @Override
             public void afterTextChanged(Editable editable){}
         });
     }
+
+    private boolean validateNumber(CharSequence str) {
+        if(str.length()==0){
+            numberInputLayout.setError("Cannot be empty");
+            return false;
+        }
+        else if(str.length()<10 || str.length()>15){
+            numberInputLayout.setError("Minimum 10, maximum 14 numbers");
+            return false;
+        }
+        else if(checkPattern(str, NUMBER_PATTERN)){
+            numberInputLayout.setError(null);
+            return true;
+        }else{
+            numberInputLayout.setError("Only number allowed");
+            return false;
+        }
+    }
+
     void checkPassword(){
-        TextInputLayout textInputLayout = findViewById(R.id.newPassword);
-        textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
+
+        passwordInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
             @Override
             public void onTextChanged(CharSequence str, int i, int i1, int i2) {
-                if(str.length()==0){
-                    textInputLayout.setError("Cannot be empty");
-                    usernameCheck = false;
-                }
-                else if(checkPattern(str, PASSWORD_PATTERN)){
-                    textInputLayout.setError(null);
-                    newPasswordCheck = true;
-                }else{
-                    textInputLayout.setError("Must contain (1 uppercase, 1 special character,3 " +
-                            "digits and minimum 10 length)");
-                    newPasswordCheck = false;
-                }
+                validatePassword(str);
             }
-
             @Override
             public void afterTextChanged(Editable editable){}
         });
     }
+
+    private boolean validatePassword(CharSequence str) {
+        if(str.length()==0){
+            passwordInputLayout.setError("Cannot be empty");
+            return false;
+        }
+        else if(checkPattern(str, PASSWORD_PATTERN)){
+            passwordInputLayout.setError(null);
+            return true;
+        }else{
+            passwordInputLayout.setError("Must contain (1 uppercase, 1 special character,3 " +
+                    "digits and minimum 10 length)");
+            return false;
+        }
+    }
+
     boolean checkPattern(CharSequence str,String pattern){
         Pattern sPattern = Pattern.compile(pattern);
         return sPattern.matcher(str).matches();
+    }
+
+    // TODO: For testing
+    void fillData(){
+//         passwordInputLayout.getEditText().setText("Ganesh@1234");
+//         numberInputLayout;
+//         emailInputLayout;
+//         fullNameInputLayout;
+//         usernameInputLayout;
     }
 
 }

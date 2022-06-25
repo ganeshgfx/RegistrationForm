@@ -47,11 +47,11 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="wrap_content"
                         android:layout_gravity="center"
-                        app:cardCornerRadius="100dp"
+                        app:cardCornerRadius="50dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:backgroundTint="@color/base"
-                        app:cardElevation="3dp"
+                        app:cardElevation="4dp"
                         android:layout_margin="9dp"
                         android:id="@+id/imageCard"
                         style="@style/Widget.Material3.CardView.Outlined"

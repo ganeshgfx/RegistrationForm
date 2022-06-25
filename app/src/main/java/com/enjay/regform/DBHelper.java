@@ -46,7 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
     public String insertUser (String username, String fullname, String email, String number,
-                               String gender,String hobbies,String password,byte[] img) {
+                              String gender,String hobbies,String password,byte[] img) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(USERNAME, username);
@@ -90,8 +90,8 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cur =
                 db.rawQuery( "select "+PROFILE+" from "+TABLE_NAME+" where "+USERNAME+" = '"+username+
-                        "';"
-                , null );
+                                "';"
+                        , null );
 
         if (cur.moveToFirst()){
             byte[] imgByte = cur.getBlob(0);
@@ -105,20 +105,28 @@ public class DBHelper extends SQLiteOpenHelper {
         return null;
     }
     @SuppressLint("Range")
-    public String login(String username, String password){
+    public User login(String username, String password) {
+
         SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor res =
-                db.rawQuery( "select * from "+TABLE_NAME+" where "+USERNAME+" = '"+username+"' " +
-                                "AND '"+password+"';"
-                , null );
+                db.rawQuery("select * from " + TABLE_NAME + " where " + USERNAME + " = '" + username + "' " +
+                                "AND " + PASSWORD + " = '" + password + "';"
+                        , null);
         res.moveToFirst();
 
-        return USERNAME+" : "+res.getString(res.getColumnIndex(USERNAME))+
-                "\n"+FULL_NAME+" : "+res.getString(res.getColumnIndex(FULL_NAME))+
-                "\n"+EMAIL+" : "+res.getString(res.getColumnIndex(EMAIL))+
-                "\n"+NUMBER+" : "+res.getString(res.getColumnIndex(NUMBER))+
-                "\n"+GENDER+" : "+res.getString(res.getColumnIndex(GENDER))+
-                "\n"+HOBBIES+" : "+res.getString(res.getColumnIndex(HOBBIES))+
-                "\n"+PASSWORD+" : "+res.getString(res.getColumnIndex(PASSWORD));
+       if(res.getCount()==1)
+
+        return new User(
+                res.getString(res.getColumnIndex(USERNAME)),
+                res.getString(res.getColumnIndex(FULL_NAME)),
+                res.getString(res.getColumnIndex(EMAIL)),
+                res.getString(res.getColumnIndex(NUMBER)),
+                res.getString(res.getColumnIndex(PASSWORD)),
+                res.getString(res.getColumnIndex(GENDER)),
+                res.getString(res.getColumnIndex(HOBBIES)),
+                getProfile(username)
+        );
+       else return null;
     }
 }
