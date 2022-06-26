@@ -12,6 +12,7 @@ import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -93,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkOldLogin();
+
 //        startActivity(new Intent(MainActivity.this,LoginActivity.class));
 //        finish();
 
@@ -164,13 +167,30 @@ public class MainActivity extends AppCompatActivity {
             alertDialog = builder.create();
             alertDialog.show();
             imageCard.setStrokeColor(ContextCompat.getColor(this,R.color.onBase));
-            imageCard.setStrokeWidth(1);
+            imageCard.setStrokeWidth(3);
             editProfileIcon.setColorFilter(ContextCompat.getColor(this,R.color.onBase));
         });
         login.setOnClickListener(click->{
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
             finish();
         });
+    }
+
+    private void checkOldLogin() {
+        SharedPreferences sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
+
+        if(sharedPreferences.getBoolean("userCredentials",false)){
+            String username = sharedPreferences.getString("USERNAME", "");
+            String password = sharedPreferences.getString("PASSWORD", "");
+
+            Intent intent = new Intent(MainActivity.this,HomeActivity.class);
+            intent.putExtra("USERNAME", username);
+            intent.putExtra("PASSWORD", password);
+
+            startActivity(intent);
+            finish();
+        }
+
     }
 
     private boolean validateHobbies() {
@@ -261,8 +281,7 @@ public class MainActivity extends AppCompatActivity {
                         alertDialog.dismiss();
                         img = selectedImage;
                     } catch (Exception e) {
-                        Toast.makeText(MainActivity.this,
-                                e.getLocalizedMessage()+":"+e.getMessage(), Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(MainActivity.this,e.getLocalizedMessage()+":"+e.getMessage(), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                 }

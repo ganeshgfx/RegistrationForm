@@ -73,6 +73,15 @@
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:text="User {\nerror : some error is there \n}"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:layout_margin="20dp"
+           android:layout_gravity="center"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:text="logout" />
     </LinearLayout>
 
 </FrameLayout>

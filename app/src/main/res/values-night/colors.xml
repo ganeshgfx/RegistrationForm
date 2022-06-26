@@ -12,5 +12,10 @@
 
     <color name="backg">#CE000000</color>
 
+    <color name="cardbg">#D5161616</color>
+
     <color name="red">#D32F2F</color>
+
+    <color name="appbg">#25BB86FC</color>
+
 </resources>

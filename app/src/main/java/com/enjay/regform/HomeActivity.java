@@ -2,6 +2,8 @@ package com.enjay.regform;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,6 +17,9 @@ public class HomeActivity extends AppCompatActivity {
     TextView details;
 
     User user;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editSP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,15 @@ public class HomeActivity extends AppCompatActivity {
         profile.setImageBitmap(user.getImg());
         details.setText(user.toString());
         name.setText(user.fullName);
+
+        findViewById(R.id.logout).setOnClickListener(click->{
+            sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
+            editSP = sharedPreferences.edit();
+            editSP.putBoolean("userCredentials",false);
+            editSP.commit();
+            startActivity(new Intent(HomeActivity.this,MainActivity.class));
+            finish();
+        });
 
         //Toast.makeText(this, user.toString(), Toast.LENGTH_SHORT).show();
     }

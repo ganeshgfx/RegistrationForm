@@ -7,11 +7,13 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        app:tint="@color/purple_200"
-        android:src="@drawable/ic_planet" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+       android:scaleType="fitStart"
+        app:tint="@color/appbg"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_planetk" />
 
     <ScrollView
         android:id="@+id/mainScroll"
@@ -83,7 +85,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:backgroundTint="@color/backg"
+                app:cardBackgroundColor="@color/cardbg"
                 android:layout_margin="8dp">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -158,6 +160,7 @@
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
+                      app:cardBackgroundColor="#00FFFFFF"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="10dp">
                        <LinearLayout
@@ -168,6 +171,7 @@
                            <TextView
                                android:layout_width="wrap_content"
                                android:layout_height="wrap_content"
+                               android:background="@color/base"
                                android:layout_marginStart="10dp"
                                android:text="Gender"/>
                            <RadioGroup
@@ -210,6 +214,7 @@
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        app:cardBackgroundColor="#00FFFFFF"
                         android:layout_marginBottom="10dp">
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -217,27 +222,27 @@
                             android:orientation="vertical"
                             android:layout_height="wrap_content">
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
                                 android:paddingStart="5dp"
                                 android:text="Select Hobbies"/>
                             <CheckBox
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/sports"
                                 android:text="Sports"/>
                             <CheckBox
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/music"
                                 android:text="Music"/>
                             <CheckBox
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/photo"
                                 android:text="Photography"/>
                             <CheckBox
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/reading"
                                 android:text="Reading"/>

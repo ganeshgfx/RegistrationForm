@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        app:tint="@color/purple_200"
-        android:src="@drawable/ic_planet" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="fitStart"
+        app:tint="@color/appbg"
+        android:src="@drawable/ic_planetk" />
     <ScrollView
         android:id="@+id/mainScroll"
         android:layout_width="match_parent"
@@ -22,14 +23,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
             android:layout_gravity="top"
             android:orientation="vertical" >
             <LinearLayout
                 android:layout_width="match_parent"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -41,7 +39,7 @@
                     android:text="Login"
                     />
                 <FrameLayout
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
@@ -84,7 +82,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:backgroundTint="@color/backg"
+                android:backgroundTint="@color/cardbg"
                 android:layout_margin="8dp">
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -170,13 +168,11 @@
                             android:text="Sign Up" />
 
                     </LinearLayout>
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
+                    <CheckBox
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/output"
-                        android:layout_gravity="center"
-                        />
+                        android:id="@+id/saveLoginInfo"
+                        android:text="Save login info"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

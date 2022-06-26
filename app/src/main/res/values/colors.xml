@@ -12,6 +12,9 @@
     <color name="onBase">#505050</color>
 
     <color name="backg">#C8FFFFFF</color>
+    <color name="cardbg">#C8FFFFFF</color>
 
     <color name="red">#D32F2F</color>
+
+    <color name="appbg">#6ABB86FC</color>
 </resources>
