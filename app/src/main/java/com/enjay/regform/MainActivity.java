@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
                         profileCheck = true;
                         alertDialog.dismiss();
                         img = selectedImage;
+                        //bitmapToByte(img);
                     } catch (Exception e) {
                        // Toast.makeText(MainActivity.this,e.getLocalizedMessage()+":"+e.getMessage(), Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
@@ -321,11 +322,14 @@ public class MainActivity extends AppCompatActivity {
         int width = Math.round((float) ratio * bitmap.getWidth());
         int height = Math.round((float) ratio * bitmap.getHeight());
 
+        //Toast.makeText(this, height+":"+width, Toast.LENGTH_LONG).show();
         bitmap = Bitmap.createScaledBitmap(bitmap,width,height,true);
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+        //bitmap = Bitmap.createScaledBitmap(bitmap,500,500,true);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 50, outputStream);
 
-        return outputStream.toByteArray();
+        return (outputStream.toByteArray());
     }
+
     String getInput(int id){
         TextInputLayout textInputLayout = findViewById(id);
         return textInputLayout.getEditText().getText().toString();

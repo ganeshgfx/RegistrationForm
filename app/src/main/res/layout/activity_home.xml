@@ -66,5 +66,11 @@
             android:layout_weight="1">
         </androidx.fragment.app.FragmentContainerView>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:id="@+id/listView"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"/>
+
     </LinearLayout>
 </FrameLayout>

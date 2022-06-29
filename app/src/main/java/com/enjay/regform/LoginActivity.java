@@ -57,7 +57,6 @@ public class LoginActivity extends AppCompatActivity {
                     editSP.putString("PASSWORD", password);
                 }
                 editSP.commit();
-
                 startActivity(intent);
                 finish();
                 //Toast.makeText(this, user.toString(),Toast.LENGTH_SHORT).show();

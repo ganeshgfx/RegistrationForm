@@ -15,6 +15,8 @@ import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -31,7 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String PROFILE = "profile";
 
     public DBHelper(Context context) {
-        super(context, DATABASE , null, 15);
+        super(context, DATABASE , null, 17);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -118,20 +120,50 @@ public class DBHelper extends SQLiteOpenHelper {
                         , null);
         res.moveToFirst();
 
-       if(res.getCount()==1)
+        if(res.getCount()==1)
 
-        return new User(
-                res.getString(res.getColumnIndex(USERNAME)),
-                res.getString(res.getColumnIndex(FULL_NAME)),
-                res.getString(res.getColumnIndex(EMAIL)),
-                res.getString(res.getColumnIndex(NUMBER)),
-//                res.getString(res.getColumnIndex(PASSWORD)),
-                "",
-                res.getString(res.getColumnIndex(GENDER)),
-                res.getString(res.getColumnIndex(HOBBIES)),
-                getProfile(username)
-        );
-       else return null;
+            return new User(
+                    res.getString(res.getColumnIndex(USERNAME)),
+                    res.getString(res.getColumnIndex(FULL_NAME)),
+                    res.getString(res.getColumnIndex(EMAIL)),
+                    res.getString(res.getColumnIndex(NUMBER)),
+                    res.getString(res.getColumnIndex(PASSWORD)),
+                    res.getString(res.getColumnIndex(GENDER)),
+                    res.getString(res.getColumnIndex(HOBBIES)),
+                    getProfile(username)
+            );
+        else return null;
+    }
+    @SuppressLint("Range")
+    public List<User> getAllData() {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor res =
+                db.rawQuery("select * from " + TABLE_NAME + ";", null);
+        res.moveToFirst();
+        List<User> users = new ArrayList<>();
+       if (res.moveToFirst()){
+           while (!res.isAfterLast()) {
+
+//            byte[] blob = res.getBlob(res.getColumnIndex(PROFILE));
+//            Bitmap img = BitmapFactory.decodeByteArray(blob, 0, blob.length);
+
+               users.add(new User(
+                       res.getString(res.getColumnIndex(USERNAME)),
+                       res.getString(res.getColumnIndex(FULL_NAME)),
+                       res.getString(res.getColumnIndex(EMAIL)),
+                       res.getString(res.getColumnIndex(NUMBER)),
+                       res.getString(res.getColumnIndex(PASSWORD)),
+                       res.getString(res.getColumnIndex(GENDER)),
+                       res.getString(res.getColumnIndex(HOBBIES)),
+                       getProfile( res.getString(res.getColumnIndex(USERNAME)))
+               ));
+               Log.d("TAG", "getAllData: "+ res.getString(res.getColumnIndex(USERNAME)));
+               res.moveToNext();
+           }
+       }
+        return users;
     }
 
     //for future use

@@ -1,15 +1,21 @@
 package com.enjay.regform;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.enjay.regform.fragment.ProfileFragment;
+import com.enjay.regform.fragment.profile.MyListAdapter;
 import com.google.android.material.card.MaterialCardView;
+
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -35,14 +41,18 @@ public class HomeActivity extends AppCompatActivity {
 
         data = new DBHelper(HomeActivity.this);
 
+        Log.d("TAG", "onCreate: "+  getIntent().getStringExtra("USERNAME"));
+        Log.d("TAG", "onCreate: "+  getIntent().getStringExtra("PASSWORD"));
+
         user = data.login(
                 getIntent().getStringExtra("USERNAME"),
                 getIntent().getStringExtra("PASSWORD")
         );
+        if(user!=null){
+            profile.setImageBitmap(user.getImg());
+            name.setText(user.fullName);
+        }
 
-        profile.setImageBitmap(user.getImg());
-
-        name.setText(user.fullName);
 
         getSupportFragmentManager().beginTransaction()
                 .setReorderingAllowed(true)
@@ -54,6 +64,13 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.listView);
+
+        LinearLayoutManager layout = new LinearLayoutManager(this);
+        layout.setOrientation(RecyclerView.HORIZONTAL);
+        recyclerView.setLayoutManager(
+                layout);
+        recyclerView.setAdapter(new MyListAdapter(data.getAllData()));
     }
 
     private void logOut() {
