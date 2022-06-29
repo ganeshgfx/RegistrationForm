@@ -16,10 +16,10 @@ public class LoginActivity extends AppCompatActivity {
     DBHelper data;
     User user;
     CheckBox saveLoginInfo;
+    CheckBox directLogin;
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editSP;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         editSP = sharedPreferences.edit();
 
         saveLoginInfo = findViewById(R.id.saveLoginInfo);
+        directLogin = findViewById(R.id.loginDirect);
 
         findViewById(R.id.signup).setOnClickListener(click->{
             startActivity(new Intent(LoginActivity.this,MainActivity.class));
@@ -48,15 +49,13 @@ public class LoginActivity extends AppCompatActivity {
                 intent.putExtra("USERNAME", user.username);
                 intent.putExtra("PASSWORD", user.password);
 
-                if(saveLoginInfo.isChecked()){
-
+                if(saveLoginInfo.isChecked() || directLogin.isChecked()){
                     String username = getInput(R.id.username);
                     String password = getInput(R.id.password);
 
                     editSP.putString("USERNAME", username);
                     editSP.putString("PASSWORD", password);
                 }
-
                 editSP.commit();
 
                 startActivity(intent);
@@ -65,23 +64,39 @@ public class LoginActivity extends AppCompatActivity {
             }
 
         });
-        saveLoginInfo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b){
-                    editSP.putBoolean("userCredentials",true);
-                    return;
-                }
-                else {
-                    editSP.putBoolean("userCredentials",false);
-                    return;
-                }
+        saveLoginInfo.setOnCheckedChangeListener((compoundButton, b) -> {
+            editSP.putBoolean("userCredentials",b);
+            if (b){
+                directLogin.setChecked(false);
             }
+            return;
         });
+        directLogin.setOnCheckedChangeListener((compoundButton, b) -> {
+            editSP.putBoolean("directLogin",b);
+            if (b){
+                saveLoginInfo.setChecked(false);
+            }
+            return;
+        });
+        autofill();
     }
 
     String getInput(int id){
         TextInputLayout textInputLayout = findViewById(id);
         return textInputLayout.getEditText().getText().toString();
+    }
+    void setInput(int id,String msg){
+        TextInputLayout textInputLayout = findViewById(id);
+        textInputLayout.getEditText().setText(msg);
+    }
+
+    private void autofill() {
+        if(sharedPreferences.getBoolean("userCredentials",false)){
+            String username = sharedPreferences.getString("USERNAME", "");
+            String password = sharedPreferences.getString("PASSWORD", "");
+            setInput(R.id.username,username);
+            setInput(R.id.password,password);
+        }
+
     }
 }

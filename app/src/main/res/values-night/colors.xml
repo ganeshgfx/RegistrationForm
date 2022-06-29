@@ -18,4 +18,6 @@
 
     <color name="appbg">#25BB86FC</color>
 
+    <color name="appbgBase">#1DBB86FC</color>
+
 </resources>

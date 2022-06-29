@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import java.util.List;
 
 public class User {
+
     String username;
     String fullName;
     String email;

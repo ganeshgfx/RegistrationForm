@@ -89,17 +89,19 @@ public class MainActivity extends AppCompatActivity {
     Button signup;
     Button login;
 
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editSP;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkOldLogin();
-
 //        startActivity(new Intent(MainActivity.this,LoginActivity.class));
 //        finish();
 
         data = new DBHelper(MainActivity.this);
+        checkOldLogin();
 
         profile = findViewById(R.id.profile);
         editProfileIcon = findViewById(R.id.editProfileIcon);
@@ -174,21 +176,29 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
             finish();
         });
+
+        sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
+        editSP = sharedPreferences.edit();
     }
 
     private void checkOldLogin() {
         SharedPreferences sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
 
-        if(sharedPreferences.getBoolean("userCredentials",false)){
+        if(sharedPreferences.getBoolean("directLogin",false)){
             String username = sharedPreferences.getString("USERNAME", "");
             String password = sharedPreferences.getString("PASSWORD", "");
 
-            Intent intent = new Intent(MainActivity.this,HomeActivity.class);
-            intent.putExtra("USERNAME", username);
-            intent.putExtra("PASSWORD", password);
+            if(data.login(username,password)==null){
+                return;
+            }
+            else {
+                Intent intent = new Intent(MainActivity.this,HomeActivity.class);
+                intent.putExtra("USERNAME", username);
+                intent.putExtra("PASSWORD", password);
 
-            startActivity(intent);
-            finish();
+                startActivity(intent);
+                finish();
+            }
         }
 
     }

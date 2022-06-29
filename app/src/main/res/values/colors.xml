@@ -17,4 +17,5 @@
     <color name="red">#D32F2F</color>
 
     <color name="appbg">#6ABB86FC</color>
+    <color name="appbgBase">#25BB86FC</color>
 </resources>

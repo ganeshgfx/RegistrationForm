@@ -7,14 +7,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.enjay.regform.fragment.ProfileFragment;
+import com.google.android.material.card.MaterialCardView;
 
 public class HomeActivity extends AppCompatActivity {
 
     DBHelper data;
     ImageView profile;
+    MaterialCardView profileCard;
     TextView name;
-    TextView details;
 
     User user;
 
@@ -29,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
 
         profile = findViewById(R.id.profile);
         name = findViewById(R.id.name);
-        details = findViewById(R.id.details);
+        profileCard = findViewById(R.id.myProfileCard);
 
         data = new DBHelper(HomeActivity.this);
 
@@ -39,18 +41,31 @@ public class HomeActivity extends AppCompatActivity {
         );
 
         profile.setImageBitmap(user.getImg());
-        details.setText(user.toString());
+
         name.setText(user.fullName);
 
-        findViewById(R.id.logout).setOnClickListener(click->{
-            sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
-            editSP = sharedPreferences.edit();
-            editSP.putBoolean("userCredentials",false);
-            editSP.commit();
-            startActivity(new Intent(HomeActivity.this,MainActivity.class));
-            finish();
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .add(R.id.fragment_viewProfile, ProfileFragment.class, null)
+                .commit();
+
+        profileCard.setOnLongClickListener(view -> {
+            logOut();
+            return false;
         });
 
-        //Toast.makeText(this, user.toString(), Toast.LENGTH_SHORT).show();
     }
+
+    private void logOut() {
+        sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
+        editSP = sharedPreferences.edit();
+        editSP.putBoolean("userCredentials",false);
+        editSP.putBoolean("directLogin",false);
+        editSP.putString("USERNAME", "");
+        editSP.putString("PASSWORD", "");
+        editSP.commit();
+        startActivity(new Intent(HomeActivity.this,MainActivity.class));
+        finish();
+    }
+
 }

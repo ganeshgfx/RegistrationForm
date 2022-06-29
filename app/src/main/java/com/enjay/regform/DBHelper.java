@@ -13,6 +13,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE = "myapp.db";
@@ -78,7 +81,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor res =  db.rawQuery( "select * from "+TABLE_NAME+" where "+USERNAME+" = '"+username+"';"
                 , null );
         res.moveToFirst();
-        return USERNAME+" : "+res.getString(res.getColumnIndex(USERNAME))+
+        return ""+USERNAME+" : "+res.getString(res.getColumnIndex(USERNAME))+
                 "\n"+FULL_NAME+" : "+res.getString(res.getColumnIndex(FULL_NAME))+
                 "\n"+EMAIL+" : "+res.getString(res.getColumnIndex(EMAIL))+
                 "\n"+NUMBER+" : "+res.getString(res.getColumnIndex(NUMBER))+
@@ -122,11 +125,33 @@ public class DBHelper extends SQLiteOpenHelper {
                 res.getString(res.getColumnIndex(FULL_NAME)),
                 res.getString(res.getColumnIndex(EMAIL)),
                 res.getString(res.getColumnIndex(NUMBER)),
-                res.getString(res.getColumnIndex(PASSWORD)),
+//                res.getString(res.getColumnIndex(PASSWORD)),
+                "",
                 res.getString(res.getColumnIndex(GENDER)),
                 res.getString(res.getColumnIndex(HOBBIES)),
                 getProfile(username)
         );
        else return null;
+    }
+
+    //for future use
+    public String md5(String password,String salt) {
+        String s =  password+salt;
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0; i<messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
