@@ -1,6 +1,9 @@
 package com.enjay.regform;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,11 +56,15 @@ public class HomeActivity extends AppCompatActivity {
             name.setText(user.fullName);
         }
 
+        Bundle args = new Bundle();
+        args.putCharSequence("name","User");
 
-        getSupportFragmentManager().beginTransaction()
-                .setReorderingAllowed(true)
-                .add(R.id.fragment_viewProfile, ProfileFragment.class, null)
-                .commit();
+//        getSupportFragmentManager().beginTransaction()
+//                .setReorderingAllowed(true)
+//                .add(R.id.fragment_viewProfile, ProfileFragment.class, null)
+//                .commit();
+
+
 
         profileCard.setOnLongClickListener(view -> {
             logOut();
@@ -68,9 +75,13 @@ public class HomeActivity extends AppCompatActivity {
 
         LinearLayoutManager layout = new LinearLayoutManager(this);
         layout.setOrientation(RecyclerView.HORIZONTAL);
-        recyclerView.setLayoutManager(
-                layout);
-        recyclerView.setAdapter(new MyListAdapter(data.getAllData()));
+        recyclerView.setLayoutManager(layout);
+        recyclerView.setAdapter(
+                new MyListAdapter(
+                        data.getAllData(),
+                        getSupportFragmentManager()
+                )
+        );
     }
 
     private void logOut() {

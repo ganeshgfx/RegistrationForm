@@ -7,8 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.enjay.regform.R;
+import com.enjay.regform.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,8 +29,13 @@ public class ProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private User user;
+
     public ProfileFragment() {
         // Required empty public constructor
+    }
+    public ProfileFragment(User user) {
+        this.user = user;
     }
 
     /**
@@ -39,6 +47,13 @@ public class ProfileFragment extends Fragment {
      * @return A new instance of fragment home.
      */
     // TODO: Rename and change types and number of parameters
+
+    ImageView profile;
+    TextView name;
+    TextView username;
+    TextView email;
+    TextView number;
+
     public static ProfileFragment newInstance(String param1, String param2) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -46,6 +61,7 @@ public class ProfileFragment extends Fragment {
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+
     }
 
     @Override
@@ -61,6 +77,33 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        profile = view.findViewById(R.id.profileImg);
+        name = view.findViewById(R.id.name);
+        username = view.findViewById(R.id.username);
+        email = view.findViewById(R.id.email);
+        number = view.findViewById(R.id.number);
+
+        if(user!=null) {
+            profile.setImageBitmap(user.getImg());
+            profile.setVisibility(View.VISIBLE);
+
+            name.setText(user.getFullName());
+            name.setVisibility(View.VISIBLE);
+
+            username.setText(user.getUsername());
+            username.setVisibility(View.VISIBLE);
+
+            email.setText(user.getEmail());
+            email.setVisibility(View.VISIBLE);
+
+            number.setText(user.getNumber());
+            number.setVisibility(View.VISIBLE);
+
+            view.findViewById(R.id.backLayer).setVisibility(View.VISIBLE);
+
+        }
+        return view;
     }
 }

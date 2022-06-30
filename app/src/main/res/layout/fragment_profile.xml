@@ -9,6 +9,8 @@
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
+        android:visibility="gone"
+        android:id="@+id/backLayer"
         style="@style/Widget.Material3.CardView.Filled"
         android:layout_height="match_parent">
         <LinearLayout
@@ -26,16 +28,47 @@
                 <ImageView
                     android:layout_width="200dp"
                     android:layout_height="200dp"
+                    android:scaleType="centerCrop"
                     android:id="@+id/profileImg"
+                    android:visibility="gone"
                     android:src="@drawable/ic_twotone_insert_emoticon_24"/>
             </com.google.android.material.card.MaterialCardView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:visibility="gone"
+                android:id="@+id/name"
                 style="@style/TextAppearance.Material3.HeadlineMedium"
                 android:layout_gravity="center"
                 android:text="Name" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/username"
+                android:visibility="gone"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_gravity="center"
+                android:text="Name" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/email"
+                android:visibility="gone"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_gravity="center"
+                android:text="email" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:id="@+id/number"
+                android:visibility="gone"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_gravity="center"
+                android:text="number" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
