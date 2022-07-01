@@ -18,4 +18,7 @@
 
     <color name="appbg">#6ABB86FC</color>
     <color name="appbgBase">#25BB86FC</color>
+
+    <color name="toolStatus">#34BB86FC</color>
+
 </resources>

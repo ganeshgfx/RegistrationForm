@@ -17,6 +17,12 @@
         <item name="android:statusBarColor">#00FFFFFF</item>
         <item name="android:navigationBarColor">#00FFFFFF</item>
 
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+    </style>
+    <style name="Theme.Home" parent="Theme.RegForm">
+        <item name="android:statusBarColor">@color/toolStatus</item>
     </style>
 
 </resources>

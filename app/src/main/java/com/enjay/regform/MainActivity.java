@@ -100,6 +100,9 @@ public class MainActivity extends AppCompatActivity {
 //        startActivity(new Intent(MainActivity.this,LoginActivity.class));
 //        finish();
 
+        sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
+        editSP = sharedPreferences.edit();
+
         data = new DBHelper(MainActivity.this);
         checkOldLogin();
 
@@ -131,10 +134,22 @@ public class MainActivity extends AppCompatActivity {
             confirmPassword = getInput(R.id.confirmPassword);
 
             if( validateUsername(username) && validateFullName(fullName) && validateEmail(email) && validateNumber(number) && validatePassword(newPassword) && checkConfirmPassword() && isGenderCheck() && validateHobbies() && checkProfile()){
-                String result = data.insertUser(username,fullName,email,number,gender,
+                boolean result = data.insertUser(username,fullName,email,number,gender,
                         hobbies.toString(),
                         newPassword,bitmapToByte(img));
-                Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+                if(result) {
+                 if(getIntent().getBooleanExtra("fromHome",false)){
+                     finish();
+                 }
+                 else {
+                     Toast.makeText(this, "Inserted", Toast.LENGTH_SHORT).show();
+                 }
+                }
+                else {
+                    usernameInputLayout.setError("Username not available");
+                    scrollTop();
+                }
+                //Toast.makeText(this, result+"", Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -177,14 +192,14 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
 
-        sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
-        editSP = sharedPreferences.edit();
     }
 
     private void checkOldLogin() {
-        SharedPreferences sharedPreferences = getSharedPreferences("regForm",MODE_PRIVATE);
 
-        if(sharedPreferences.getBoolean("directLogin",false)){
+        if(sharedPreferences.getBoolean("ADD_NEW",false)){
+            editSP.putBoolean("ADD_NEW", false);
+            editSP.commit();
+        } else if(sharedPreferences.getBoolean("directLogin",false)){
             String username = sharedPreferences.getString("USERNAME", "");
             String password = sharedPreferences.getString("PASSWORD", "");
 
@@ -199,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             }
+        }else {
+
         }
 
     }

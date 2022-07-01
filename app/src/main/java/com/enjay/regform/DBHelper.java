@@ -50,7 +50,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME);
         onCreate(db);
     }
-    public String insertUser (String username, String fullname, String email, String number,
+    public boolean insertUser (String username, String fullname, String email, String number,
                               String gender,String hobbies,String password,byte[] img) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -66,11 +66,14 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             db.insertOrThrow(TABLE_NAME, null, contentValues);
         }catch (SQLiteConstraintException error){
-            return "Error : "+error.getMessage();
+            //return "Error : "+error.getMessage();
+            return false;
         }catch (Exception error){
-            return "Some Error : "+error.getMessage();
+            //return "Some Error : "+error.getMessage();
+            return false;
         }
-        return "Inserted";
+        //return "Inserted";
+        return true;
     }
     public int numberOfRows(){
         SQLiteDatabase db = this.getReadableDatabase();
@@ -159,7 +162,7 @@ public class DBHelper extends SQLiteOpenHelper {
                        res.getString(res.getColumnIndex(HOBBIES)),
                        getProfile( res.getString(res.getColumnIndex(USERNAME)))
                ));
-               Log.d("TAG", "getAllData: "+ res.getString(res.getColumnIndex(USERNAME)));
+              // Log.d("TAG", "getAllData: "+ res.getString(res.getColumnIndex(USERNAME)));
                res.moveToNext();
            }
        }
