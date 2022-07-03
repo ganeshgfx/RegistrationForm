@@ -80,15 +80,15 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.RecycleVie
                 //whether api
                 //firebase api
 
-//                ValueAnimator anim = ValueAnimator.ofFloat(0, -150
-//                );
-//                anim.setInterpolator(new AnticipateOvershootInterpolator());
-//                anim.setDuration(500);
-//                anim.start();
-//                anim.addUpdateListener(updatedAnimation -> {
-//                    float animatedValue = (float)updatedAnimation.getAnimatedValue();
-//                    holder.card.setTranslationY(animatedValue);
-//                });
+                ValueAnimator anim = ValueAnimator.ofFloat(0, -150
+                );
+                anim.setInterpolator(new AnticipateOvershootInterpolator());
+                anim.setDuration(500);
+                anim.start();
+                anim.addUpdateListener(updatedAnimation -> {
+                    float animatedValue = (float)updatedAnimation.getAnimatedValue();
+                    holder.card.setTranslationY(animatedValue);
+                });
 
             }else{
                 holder.card.setStrokeColor(ContextCompat.getColor(context, R.color.onBase));
@@ -103,15 +103,15 @@ public class MyListAdapter extends RecyclerView.Adapter<MyListAdapter.RecycleVie
                     holder.card.setStrokeWidth(animatedValue);
                 });
 
-//                ValueAnimator anim = ValueAnimator.ofFloat( -150, 0
-//                );
-//                anim.setInterpolator(new AnticipateOvershootInterpolator());
-//                anim.setDuration(500);
-//                anim.start();
-//                anim.addUpdateListener(updatedAnimation -> {
-//                    float animatedValue = (float)updatedAnimation.getAnimatedValue();
-//                    holder.card.setTranslationY(animatedValue);
-//                });
+                ValueAnimator anim = ValueAnimator.ofFloat( -150, 0
+                );
+                anim.setInterpolator(new AnticipateOvershootInterpolator());
+                anim.setDuration(500);
+                anim.start();
+                anim.addUpdateListener(updatedAnimation -> {
+                    float animatedValue = (float)updatedAnimation.getAnimatedValue();
+                    holder.card.setTranslationY(animatedValue);
+                });
             }
         });
 

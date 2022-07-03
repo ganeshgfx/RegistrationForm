@@ -14,6 +14,7 @@
         <!-- Customize your theme here. -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
+
         <item name="android:statusBarColor">#00FFFFFF</item>
         <item name="android:navigationBarColor">#00FFFFFF</item>
 
